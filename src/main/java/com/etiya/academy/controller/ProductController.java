@@ -3,13 +3,10 @@ package com.etiya.academy.controller;
 
 import com.etiya.academy.entity.Product;
 import com.etiya.academy.service.ProductService;
-import com.etiya.academy.service.ProductServiceImpl;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -58,7 +55,6 @@ public class ProductController {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
 }
 
 // Product controllerdaki 5 temel operasyonu kodlamak

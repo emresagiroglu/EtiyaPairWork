@@ -13,10 +13,10 @@ public class InMemoryProductRepository implements ProductRepository{
     public List<Product> getAll() {
         return products;
     }
+    @Override
     public void add(Product product){
         products.add(product);
     }
-
     @Override
     public Product getById(int id) {
        for(Product product : products){
@@ -26,12 +26,10 @@ public class InMemoryProductRepository implements ProductRepository{
        }
        return null;
     }
-
     @Override
     public void delete(int id) {
        products.remove(getById(id));
     }
-
     @Override
     public Product update(Product product) {
         for(Product currentProduct: products){
