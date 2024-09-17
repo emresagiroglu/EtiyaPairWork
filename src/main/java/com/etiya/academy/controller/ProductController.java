@@ -45,7 +45,7 @@ public class ProductController {
        Product product = productService.getById(id);
         if (product != null) {
             productService.delete(id);
-            return new ResponseEntity<>(HttpStatus.OK);// Status 200
+            return new ResponseEntity<>(product,HttpStatus.OK);// Status 200
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Status 404
     }
@@ -54,7 +54,7 @@ public class ProductController {
         Product product = productService.getById(id);
         if(product != null){
             productService.update(updatedProduct);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(product,HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
