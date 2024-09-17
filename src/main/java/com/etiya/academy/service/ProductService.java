@@ -11,8 +11,8 @@ public interface ProductService {
 
     List<Product> getAll();
     void add(Product product);
-    Optional<Product> getById(int id);
+    Product getById(int id);
 
-    boolean delete(int id);
-    boolean update(int id, Product product);
+    void delete(int id);
+    Product update(Product product);
 }

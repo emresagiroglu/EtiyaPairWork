@@ -10,7 +10,7 @@ public interface ProductRepository {
     void add(Product product);
     Product getById(int id);
 
-    boolean delete(int id);
-    boolean update(int id , Product product);
+    void delete(int id);
+    Product update(Product product);
 
 }

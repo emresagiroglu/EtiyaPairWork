@@ -22,32 +22,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void add(Product product) {
-        // validasyon -> direkt verinin üzerinde farklı veri gerektirmeden yapılabilen kontrollerdir.
-        // iş kuralı -> genelde diğer verilerle karşılaştırma üzerine yapılan bir yapıdır.
-
-        // eposta adresi @ işareti içermelidir -> VALİDASYON
-        // aynı e posta ile bir üye bulunmamalıdır -> iş kuralı
-
-        // iş kuralı
-        if(product.getName().length() < 3){
-            throw new RuntimeException("Ürün ismi 3 haneden kısa olamaz.");
+        for(Product product1 : getAll()){
+            if(product1.getId() == product.getId()){
+                throw new RuntimeException("Aynı ID olamaz");
+            }
         }
         productRepository.add(product);
+
+    }
+
+
+    @Override
+    public Product getById(int id) {
+        return productRepository.getById(id);
     }
 
     @Override
-    public Optional<Product> getById(int id) {
-        return Optional.ofNullable(productRepository.getById(id));
+    public void delete(int id) {
+        productRepository.delete(id);
     }
 
     @Override
-    public boolean delete(int id) {
-        return productRepository.delete(id);
-    }
-
-    @Override
-    public boolean update(int id, Product product) {
-        return productRepository.update(id,product);
+    public Product update(Product product) {
+        return productRepository.update(product);
     }
 
 }

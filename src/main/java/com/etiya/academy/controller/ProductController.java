@@ -2,7 +2,6 @@ package com.etiya.academy.controller;
 
 
 import com.etiya.academy.entity.Product;
-import com.etiya.academy.exception.NotFoundException;
 import com.etiya.academy.service.ProductService;
 import com.etiya.academy.service.ProductServiceImpl;
 import lombok.AllArgsConstructor;
@@ -25,10 +24,15 @@ public class ProductController {
     public List<Product> getAll(){
         return productService.getAll();
     }
-    @GetMapping("/{id}")
-    public Product getById(@PathVariable int id){
-        return productService.getById(id).orElseThrow(() -> new NotFoundException("Product not found with id: " + id));
 
+    //getById methodu güncellendi.
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getById(@PathVariable int id){
+        Product product = productService.getById(id);
+        if(product != null){
+            return new ResponseEntity<>(product,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -37,20 +41,22 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-       boolean isDeleted = productService.delete(id);
-        if (isDeleted) {
-            return ResponseEntity.ok().build(); // Status 200
+    public ResponseEntity<Product> delete(@PathVariable int id) {
+       Product product = productService.getById(id);
+        if (product != null) {
+            productService.delete(id);
+            return new ResponseEntity<>(HttpStatus.OK);// Status 200
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Status 404
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Status 404
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Product updatedProduct) {
-        boolean isUpdated = productService.update(id, updatedProduct);
-        if (isUpdated) {
-            return ResponseEntity.ok().build(); // Status 200
+    public ResponseEntity<Product> update(@PathVariable int id, @RequestBody Product updatedProduct) {
+        Product product = productService.getById(id);
+        if(product != null){
+            productService.update(updatedProduct);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Status 404
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

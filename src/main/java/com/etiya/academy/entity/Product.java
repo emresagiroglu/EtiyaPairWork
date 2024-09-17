@@ -13,6 +13,4 @@ public class Product
     private String name;
     private Double unitPrice;
     private int unitsInStock;
-
-
 }

@@ -1,11 +1,7 @@
 package com.etiya.academy.repository;
 
 import com.etiya.academy.entity.Product;
-import org.apache.catalina.connector.Response;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,29 +28,21 @@ public class InMemoryProductRepository implements ProductRepository{
     }
 
     @Override
-    public boolean delete(int id) {
-
-        for(Product product :products){
-            if(product.getId() == id) {
-                products.remove(product);
-                return true;
-            }
-        }
-        return false;
-
+    public void delete(int id) {
+       products.remove(getById(id));
     }
 
     @Override
-    public boolean update(int id, Product product) {
+    public Product update(Product product) {
         for(Product currentProduct: products){
-            if(currentProduct.getId() == id){
+            if(currentProduct.getId() == product.getId()){
                 currentProduct.setName(product.getName());
                 currentProduct.setUnitPrice(product.getUnitPrice());
                 currentProduct.setUnitsInStock(product.getUnitsInStock());
-                return true;
+                return currentProduct;
             }
         }
-        return false;
+        return null;
     }
 
 }
