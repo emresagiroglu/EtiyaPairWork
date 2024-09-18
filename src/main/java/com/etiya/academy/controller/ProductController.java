@@ -1,7 +1,7 @@
 package com.etiya.academy.controller;
 
 
-import com.etiya.academy.entity.Product;
+import com.etiya.academy.dto.product.*;
 import com.etiya.academy.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,40 +18,39 @@ public class ProductController {
 
     // 5 temel operation
     @GetMapping()
-    public List<Product> getAll(){
+    public List<ListProductResponseDto> getAll(){
         return productService.getAll();
     }
 
     //getById methodu güncellendi.
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable int id){
-        Product product = productService.getById(id);
+    public ResponseEntity<GetProductByIdResponseDto> getById(@PathVariable int id){
+        GetProductByIdResponseDto product = productService.getById(id);
         if(product != null){
             return new ResponseEntity<>(product,HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    public void add(@RequestBody Product product){
-        productService.add(product);
+    public ResponseEntity<CreateProductResponseDto> add(@RequestBody CreateProductRequestDto createProductRequestDto){
+       return new ResponseEntity<>(productService.add(createProductRequestDto),HttpStatus.CREATED) ;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Product> delete(@PathVariable int id) {
-       Product product = productService.getById(id);
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+       GetProductByIdResponseDto product = productService.getById(id);
         if (product != null) {
             productService.delete(id);
-            return new ResponseEntity<>(product,HttpStatus.OK);// Status 200
+            return new ResponseEntity<>(HttpStatus.OK);// Status 200
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Status 404
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable int id, @RequestBody Product updatedProduct) {
-        Product product = productService.getById(id);
+    public ResponseEntity<UpdateProductResponseDto> update(@PathVariable int id, @RequestBody UpdateProductRequestDto updatedProduct) {
+        GetProductByIdResponseDto product = productService.getById(id);
         if(product != null){
-            productService.update(updatedProduct);
-            return new ResponseEntity<>(product,HttpStatus.OK);
+            UpdateProductResponseDto updateProductResponseDto = productService.update(id,updatedProduct);
+            return new ResponseEntity<>(updateProductResponseDto,HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

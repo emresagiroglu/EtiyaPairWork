@@ -14,8 +14,9 @@ public class InMemoryProductRepository implements ProductRepository{
         return products;
     }
     @Override
-    public void add(Product product){
+    public Product add(Product product){
         products.add(product);
+        return product;
     }
     @Override
     public Product getById(int id) {
