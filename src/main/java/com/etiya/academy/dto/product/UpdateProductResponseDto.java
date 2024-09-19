@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateProductResponseDto {
     private String name;
-    private Double unitPrice;
+    private double unitPrice;
     private int unitsInStock;
+    private int categoryId;
 }

@@ -11,7 +11,7 @@ public class Product
 {
     private int id;
     private String name;
-    private Double unitPrice;
+    private double unitPrice;
     private int unitsInStock;
-    private int categoryId;
+    private Category category;
 }

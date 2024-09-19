@@ -12,5 +12,4 @@ import java.util.List;
 @NoArgsConstructor
 public class GetCategoryByIdResponseDto {
     private String name;
-    private List<Product> products;
 }

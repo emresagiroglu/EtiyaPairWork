@@ -1,8 +1,10 @@
 package com.etiya.academy.service;
 
+import com.etiya.academy.core.exception.type.BusinessException;
 import com.etiya.academy.dto.product.*;
 import com.etiya.academy.entity.Product;
 import com.etiya.academy.mapper.ProductMapper;
+import com.etiya.academy.repository.CategoryRepository;
 import com.etiya.academy.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
+    private final CategoryService categoryService;
 
     @Override
     public List<ListProductResponseDto> getAll() {
@@ -22,8 +25,10 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products =  productRepository.getAll();
 
-        List<ListProductResponseDto> listProductResponseDtos = ProductMapper.INSTANCE.listResponseDtoFromProduct(products);
-        return listProductResponseDtos;
+
+        List<ListProductResponseDto> responseDtos = ProductMapper.INSTANCE.listResponseDtoFromProduct(products);
+//
+        return responseDtos;
     }
 
     @Override
@@ -35,6 +40,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public CreateProductResponseDto add(CreateProductRequestDto createProductRequestDto) {
+
+        boolean productWithSameName  = productRepository.getAll().stream().anyMatch(product -> product.getName().equals(createProductRequestDto.getName()));
+        if (productWithSameName) {
+            throw new BusinessException("Böyle bir ürün zaten var");
+        }
+        boolean isCategoryIdExist = categoryService.getAll().stream().anyMatch(category -> category.getId() == createProductRequestDto.getCategoryId());
+        if(!isCategoryIdExist){
+            throw new BusinessException("Böyle bir Kategori id yok");
+        }
         //request -> Product
         Random random = new Random();
 
@@ -55,7 +69,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public UpdateProductResponseDto update(int id,UpdateProductRequestDto product) {
-
+        Product productInDb  = productRepository.getById(id);
+        if(productInDb.getName().equals(product.getName()) && productInDb.getUnitPrice()  == product.getUnitPrice() && productInDb.getUnitsInStock() == product.getUnitsInStock()){
+            throw new BusinessException("Ürün fieldları aynı");
+        }
         // requestDto -> product
         Product product1 = ProductMapper.INSTANCE.productFromUpdateRequestDto(product);
         product1.setId(id);
