@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/product")
+@RequestMapping(value = "/api/v1/products")
 @RequiredArgsConstructor // final olarak işaretlenen tüm arg.ları içeren constructor
 public class ProductController {
 
