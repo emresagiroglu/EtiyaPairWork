@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -23,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Business Logic -> Loglama, Auth, İş kuralları, Validasyon
 
-        List<Product> products =  productRepository.getAll();
+        List<Product> products =  productRepository.findAll();
 
 
         List<ListProductResponseDto> responseDtos = ProductMapper.INSTANCE.listResponseDtoFromProduct(products);
@@ -33,15 +34,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public GetProductByIdResponseDto getById(int id) {
-        Product product = productRepository.getById(id);
-        GetProductByIdResponseDto getProductByIdResponseDto = ProductMapper.INSTANCE.getProductResponseDtoFromProduct(product);
-        return getProductByIdResponseDto;
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            GetProductByIdResponseDto getProductByIdResponseDto = ProductMapper.INSTANCE.getProductResponseDtoFromProduct(product);
+            return getProductByIdResponseDto;
+        } else {
+            throw new BusinessException("Product with id " + id + " not found");
+        }
     }
 
     @Override
     public CreateProductResponseDto add(CreateProductRequestDto createProductRequestDto) {
 
-        boolean productWithSameName  = productRepository.getAll().stream().anyMatch(product -> product.getName().equals(createProductRequestDto.getName()));
+        boolean productWithSameName  = productRepository.findAll().stream().anyMatch(product -> product.getName().equals(createProductRequestDto.getName()));
         if (productWithSameName) {
             throw new BusinessException("Böyle bir ürün zaten var");
         }
@@ -55,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = ProductMapper.INSTANCE.productFromCreateRequestDto(createProductRequestDto);
         product.setId(random.nextInt(1,99999));
         // Product -> add
-        Product addedProduct = productRepository.add(product);
+        Product addedProduct = productRepository.save(product);
         // Product -> Response
         CreateProductResponseDto createProductResponseDto = ProductMapper.INSTANCE.createProductResponseDtoFromProduct(addedProduct);
         return createProductResponseDto;
@@ -64,13 +70,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(int id) {
-        productRepository.delete(id);
+        productRepository.deleteById(id);
     }
 
     @Override
     public UpdateProductResponseDto update(int id,UpdateProductRequestDto product) {
-        Product productInDb  = productRepository.getById(id);
-        if(productInDb.getName().equals(product.getName()) && productInDb.getUnitPrice()  == product.getUnitPrice() && productInDb.getUnitsInStock() == product.getUnitsInStock()){
+        Optional<Product> productInDb  = productRepository.findById(id);
+        if(productInDb.get().getName().equals(product.getName()) && productInDb.get().getUnitPrice()  == product.getUnitPrice() && productInDb.get().getUnitsInStock() == product.getUnitsInStock()){
             throw new BusinessException("Ürün fieldları aynı");
         }
         // requestDto -> product
@@ -78,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
         product1.setId(id);
 
         // product update
-        Product updatedProduct = productRepository.update(product1);
+        Product updatedProduct = productRepository.save(product1);
 
         // product -> responseDto
         UpdateProductResponseDto responseProduct = ProductMapper.INSTANCE.updateResponseDtoFromProduct(updatedProduct);

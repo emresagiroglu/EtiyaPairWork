@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -28,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public List<ListCategoryResponseDto> getAll() {
 
-        List<Category> categories =  categoryRepository.getAll();
+        List<Category> categories =  categoryRepository.findAll();
 
         List<ListCategoryResponseDto> listCategoryResponseDtos = CategoryMapper.INSTANCE.listResponseDtoFromCategory(categories);
         return listCategoryResponseDtos;
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public CreateCategoryResponseDto add(CreateCategoryRequestDto createCategoryRequestDto) {
-        boolean categoryWithSameName  = categoryRepository.getAll()
+        boolean categoryWithSameName  = categoryRepository.findAll()
                 .stream()
                 .anyMatch(category -> category.getName().equals(createCategoryRequestDto.getName()));
 
@@ -52,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService{
         Category category = CategoryMapper.INSTANCE.categoryFromCreateRequestDto(createCategoryRequestDto);
         category.setId(random.nextInt(1,99999));
 
-        Category addedCategory = categoryRepository.add(category);
+        Category addedCategory = categoryRepository.save(category);
 
         CreateCategoryResponseDto createCategoryResponseDto = CategoryMapper.INSTANCE.createCategoryResponseDtoFromCategory(addedCategory);
         return createCategoryResponseDto;
@@ -60,37 +61,36 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public GetCategoryByIdResponseDto getById(int id) {
-        Category category = categoryRepository.getById(id);
-        GetCategoryByIdResponseDto getCategoryByIdResponseDto = CategoryMapper.INSTANCE.getCategoryResponseDtoFromCategory(category);
-        return getCategoryByIdResponseDto;
+        Optional<Category> categoryOptional = categoryRepository.findById(id);
+
+        if (categoryOptional.isPresent()) {
+            Category category = categoryOptional.get();
+            GetCategoryByIdResponseDto getCategoryByIdResponseDto = CategoryMapper.INSTANCE.getCategoryResponseDtoFromCategory(category);
+            return getCategoryByIdResponseDto;
+        } else {
+            throw new BusinessException("Category with id " + id + " not found");
+        }
     }
 
     @Override
     public void delete(int id) {
-        categoryRepository.delete(id);
+        categoryRepository.deleteById(id);
     }
 
     @Override
     public UpdateCategoryResponseDto update(int id, UpdateCategoryRequestDto category) {
-        Category categoryInDb  = categoryRepository.getById(id);
-        if(categoryInDb.getName().equals(category.getName())){
+        Optional<Category> categoryInDb  = categoryRepository.findById(id);
+        if(categoryInDb.get().getName().equals(category.getName())){
             throw new BusinessException("Kategori ismi aynı.");
         }
 
         Category category1 = CategoryMapper.INSTANCE.categoryFromUpdateRequestDto(category);
         category1.setId(id);
 
-        Category updatedCategory = categoryRepository.update(category1);
+        Category updatedCategory = categoryRepository.save(category1);
 
         UpdateCategoryResponseDto responseCategory = CategoryMapper.INSTANCE.updateResponseDtoFromCategory(updatedCategory);
 
         return responseCategory;
     }
 }
-// Pair: Projeye Category entitysi oluşturma ve crud işlemlerini kodlama.
-// Hali hazırdaki product entitysi için de validation ve iş kurallarının entegre edilmesi
-// (Create-Update en az 3'er validasyon ve iş kuralı örneği)
-
-// !!!
-// Podman kurulumları tamamlanmalı. (POSTGRESQL,DBEAVER)
-// Veri Modelleme ve SQL

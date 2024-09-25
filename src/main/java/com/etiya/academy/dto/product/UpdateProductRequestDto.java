@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class UpdateProductRequestDto {
 
     @Positive
     @Min(40)
-    private double unitPrice;
+    private BigDecimal unitPrice;
 
     @Positive
     private int unitsInStock;
