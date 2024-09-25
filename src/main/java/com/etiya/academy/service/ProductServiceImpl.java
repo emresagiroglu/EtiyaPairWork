@@ -56,10 +56,7 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("Böyle bir Kategori id yok");
         }
         //request -> Product
-        Random random = new Random();
-
         Product product = ProductMapper.INSTANCE.productFromCreateRequestDto(createProductRequestDto);
-        product.setId(random.nextInt(1,99999));
         // Product -> add
         Product addedProduct = productRepository.save(product);
         // Product -> Response

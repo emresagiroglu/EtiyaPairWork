@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -32,4 +33,7 @@ public class Product
     @JoinColumn(name = "categoryid")
     @ManyToOne
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<ProductCart> productCarts;
 }
