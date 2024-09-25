@@ -73,20 +73,25 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public UpdateProductResponseDto update(int id,UpdateProductRequestDto product) {
         Optional<Product> productInDb  = productRepository.findById(id);
-        if(productInDb.get().getName().equals(product.getName()) && productInDb.get().getUnitPrice()  == product.getUnitPrice() && productInDb.get().getUnitsInStock() == product.getUnitsInStock()){
-            throw new BusinessException("Ürün fieldları aynı");
+        if (productInDb.isPresent()) {
+
+            if(productInDb.get().getName().equals(product.getName()) && productInDb.get().getUnitPrice()  == product.getUnitPrice() && productInDb.get().getUnitsInStock() == product.getUnitsInStock()){
+                throw new BusinessException("Ürün fieldları aynı");
+            }
+            // requestDto -> product
+            Product product1 = ProductMapper.INSTANCE.productFromUpdateRequestDto(product);
+            product1.setId(id);
+
+            // product update
+            Product updatedProduct = productRepository.save(product1);
+
+            // product -> responseDto
+            UpdateProductResponseDto responseProduct = ProductMapper.INSTANCE.updateResponseDtoFromProduct(updatedProduct);
+
+            return responseProduct;
+        } else {
+            throw new BusinessException("Böyle bir id yok");
         }
-        // requestDto -> product
-        Product product1 = ProductMapper.INSTANCE.productFromUpdateRequestDto(product);
-        product1.setId(id);
-
-        // product update
-        Product updatedProduct = productRepository.save(product1);
-
-        // product -> responseDto
-        UpdateProductResponseDto responseProduct = ProductMapper.INSTANCE.updateResponseDtoFromProduct(updatedProduct);
-
-        return responseProduct;
     }
 
 }

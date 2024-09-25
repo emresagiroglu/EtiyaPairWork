@@ -80,17 +80,22 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public UpdateCategoryResponseDto update(int id, UpdateCategoryRequestDto category) {
         Optional<Category> categoryInDb  = categoryRepository.findById(id);
-        if(categoryInDb.get().getName().equals(category.getName())){
-            throw new BusinessException("Kategori ismi aynı.");
+        if (categoryInDb.isPresent()) {
+
+            if(categoryInDb.get().getName().equals(category.getName())){
+                throw new BusinessException("Kategori ismi aynı.");
+            }
+
+            Category category1 = CategoryMapper.INSTANCE.categoryFromUpdateRequestDto(category);
+            category1.setId(id);
+
+            Category updatedCategory = categoryRepository.save(category1);
+
+            UpdateCategoryResponseDto responseCategory = CategoryMapper.INSTANCE.updateResponseDtoFromCategory(updatedCategory);
+
+            return responseCategory;
+        } else {
+            throw new BusinessException("Böyle bir id yok");
         }
-
-        Category category1 = CategoryMapper.INSTANCE.categoryFromUpdateRequestDto(category);
-        category1.setId(id);
-
-        Category updatedCategory = categoryRepository.save(category1);
-
-        UpdateCategoryResponseDto responseCategory = CategoryMapper.INSTANCE.updateResponseDtoFromCategory(updatedCategory);
-
-        return responseCategory;
     }
 }
