@@ -20,9 +20,15 @@ public interface ProductCartMapper {
     @Mapping(target = "cartId",source = "cart.id")
     @Mapping(target = "productId",source = "product.id")
     GetProductCartResponseDto getProductCartResponseDtoFromProductCart(ProductCart productCart);
+    /*@Mapping(target = "cartId",source = "cart.id")
+    @Mapping(target = "productId",source = "product.id")
+    List<ListProductCartResponseDto> listResponseDtoFromProductCart(List<ProductCart> productCarts);*/
     @Mapping(target = "cartId",source = "cart.id")
     @Mapping(target = "productId",source = "product.id")
-    List<ListProductCartResponseDto> listResponseDtoFromProductCart(List<ProductCart> productCarts);
+    default List<ListProductCartResponseDto> listResponseDtoFromProductCart(List<ProductCart> productCarts){
+    List<ListProductCartResponseDto> responseDtos = productCarts.stream().map(productCart ->new ListProductCartResponseDto(productCart.getProduct().getId(),productCart.getCart().getId(),productCart.getQuantity())).toList();
+        return responseDtos;
+    }
     @Mapping(target = "cart.id",source = "cartId")
     @Mapping(target = "product.id",source = "productId")
     ProductCart productCartFromCreateRequestDto(CreateProductCartRequestDto dto);
